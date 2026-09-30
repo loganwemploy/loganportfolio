@@ -1,26 +1,429 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #1d1d1b;
+  --butter: #f2efa3;
+  --paper: #eeeeee;
+  --white: #ffffff;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-butter: var(--butter);
+  --color-paper: var(--paper);
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-poppins), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--butter);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- reveal primitives ---------- */
+
+[data-reveal] {
+  opacity: 0;
+}
+
+/* ---------- chunky display type ---------- */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.82;
+}
+
+/*
+ * Outline type on a flat background. Unbounded is a variable font with
+ * overlapping contours, so a plain text-stroke shows internal lines. Painting
+ * the stroke first and filling with the background colour hides them and
+ * leaves only the outer edge (hence the doubled stroke width).
+ */
+.outline-text {
+  --o-fill: var(--butter);
+  --o-stroke: var(--ink);
+  color: var(--o-fill);
+  -webkit-text-stroke: 4px var(--o-stroke);
+  paint-order: stroke fill;
+}
+
+.on-ink .outline-text {
+  --o-fill: var(--ink);
+  --o-stroke: var(--butter);
+}
+
+/* ---------- hero backdrop ---------- */
+
+.stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.star-dot {
+  position: absolute;
+  border-radius: 999px;
+  background: var(--butter);
+  animation: twinkle var(--d, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--o, 0.4);
+  }
+  50% {
+    opacity: calc(var(--o, 0.4) * 0.25);
+  }
+}
+
+.horizon {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 150vmax;
+  height: 90vmax;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #0e0e0d 97%, #1d1d1b 100%);
+  box-shadow:
+    0 -2px 80px 8px rgba(242, 239, 163, 0.16),
+    inset 0 14px 60px rgba(242, 239, 163, 0.1);
+  pointer-events: none;
+}
+
+.horizon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border-top: 1px solid rgba(242, 239, 163, 0.35);
+  mask-image: linear-gradient(to bottom, #000 0, transparent 14%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 14%);
+}
+
+/* soft looping video behind the hero copy */
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.2;
+  mix-blend-mode: screen;
+  filter: grayscale(1) contrast(1.05);
+}
+
+/* ink wash keeps the butter copy legible and fades the video out at the edges */
+.hero-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(29, 29, 27, 0.7) 0%,
+    rgba(29, 29, 27, 0.32) 38%,
+    rgba(29, 29, 27, 0.55) 72%,
+    var(--ink) 100%
+  );
+}
+
+/* ---------- four-sided marquee frame (the "play" button) ---------- */
+
+.frame {
+  --w: clamp(250px, 28vw, 360px);
+  --h: clamp(118px, 12.5vw, 160px);
+  --s: 22px;
+  position: relative;
+  display: block;
+  width: var(--w);
+  height: var(--h);
+  color: var(--butter);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.frame-strip {
+  position: absolute;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  height: var(--s);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.frame-top,
+.frame-bottom {
+  left: var(--s);
+  width: calc(var(--w) - 2 * var(--s));
+}
+
+.frame-top {
+  top: 0;
+}
+
+.frame-bottom {
+  bottom: 0;
+}
+
+.frame-left,
+.frame-right {
+  width: calc(var(--h) - 2 * var(--s));
+  transform-origin: 0 0;
+}
+
+.frame-left {
+  left: 0;
+  top: calc(var(--h) - var(--s));
+  transform: rotate(-90deg);
+}
+
+.frame-right {
+  left: var(--w);
+  top: var(--s);
+  transform: rotate(90deg);
+}
+
+.frame-track {
+  display: flex;
+  flex: none;
+  animation: marquee-x var(--dur, 16s) linear infinite;
+}
+
+.frame-track.rev {
+  animation-direction: reverse;
+}
+
+.frame-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1.4em;
+  padding-right: 1.4em;
+}
+
+.frame-core {
+  position: absolute;
+  inset: var(--s);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(242, 239, 163, 0.35);
+  border-radius: 18px;
+  transition:
+    background 0.4s var(--ease-out),
+    color 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+
+.frame-core svg {
+  width: 34px;
+  height: 34px;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.frame:hover .frame-core,
+.frame:focus-visible .frame-core {
+  background: var(--butter);
+  color: var(--ink);
+  border-color: var(--butter);
+}
+
+.frame:hover .frame-core svg,
+.frame:focus-visible .frame-core svg {
+  transform: rotate(90deg) scale(1.15);
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- big outline marquee ---------- */
+
+.big-marquee {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.big-marquee-track {
+  display: flex;
+  flex: none;
+  animation: marquee-x var(--dur, 40s) linear infinite;
+}
+
+.big-marquee-track.rev {
+  animation-direction: reverse;
+}
+
+.big-marquee-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5em;
+  padding-right: 0.5em;
+}
+
+/* ---------- work tiles ---------- */
+
+.tile {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 18px;
+  transition:
+    transform 0.7s var(--ease-out),
+    border-radius 0.7s var(--ease-out);
+}
+
+.tile-ink {
+  background: var(--ink);
+  color: var(--butter);
+}
+
+.tile-butter {
+  background: var(--butter);
+  color: var(--ink);
+}
+
+.tile-white {
+  background: #fff;
+  color: var(--ink);
+}
+
+.tile-glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  font-size: 40cqw;
+  transition: transform 0.9s var(--ease-out);
+}
+
+.tile-glyph[data-len="3"] {
+  font-size: 27cqw;
+}
+
+.tile-glyph[data-len="4"] {
+  font-size: 20cqw;
+}
+
+.work-card:hover .tile,
+.work-card:focus-visible .tile {
+  border-radius: 34px 10px 34px 10px;
+  transform: translateY(-6px);
+}
+
+.work-card:hover .tile-glyph,
+.work-card:focus-visible .tile-glyph {
+  transform: rotate(-7deg) scale(1.08);
+}
+
+.tile-visit {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  translate: 0 140%;
+  transition: translate 0.6s var(--ease-out);
+}
+
+.work-card:hover .tile-visit,
+.work-card:focus-visible .tile-visit {
+  translate: 0 0;
+}
+
+/* ---------- misc ---------- */
+
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.5s var(--ease-out);
+}
+
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+
+  .hero-video {
+    display: none;
+  }
+
+  .star-dot,
+  .frame-track,
+  .big-marquee-track {
+    animation: none !important;
+  }
+
+  .tile,
+  .tile-glyph,
+  .tile-visit {
+    transition: none !important;
+  }
+}
+
+/* visit pill colours follow the tile tone */
+.tile-ink .tile-visit {
+  background: var(--butter);
+  color: var(--ink);
+}
+
+.tile-butter .tile-visit,
+.tile-white .tile-visit {
+  background: var(--ink);
+  color: var(--butter);
 }

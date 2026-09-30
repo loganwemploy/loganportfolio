@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Logan Wilson — résumé site
 
-## Getting Started
+Motion-driven résumé / portfolio. Next.js (App Router) · TypeScript · Tailwind v4 · GSAP (ScrollTrigger, SplitText) · Lenis.
 
-First, run the development server:
+Visual language is modelled on [House of Yellow](https://houseofyellow.nl/): ink `#1d1d1b`, butter `#f2efa3`, off-white `#eeeeee`, Poppins + Unbounded, bracketed `[ 00 ]` indexes, a four-sided marquee button, and a grid/list work browser.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # static production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Edit the content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Everything on the page comes from [`src/lib/data.ts`](src/lib/data.ts): hero copy, stats, roles, projects, skills, credentials and contact details. Change text there, not in the components.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Résumé download:** replace `public/Logan_Wilson_Resume.pdf`.
+- **Hero video:** `HERO_VIDEO` in [`src/components/hero.tsx`](src/components/hero.tsx). It is hot-linked from a third-party CDN; copy the file into `public/` and point the constant at `/your-file.mp4` to self-host.
+- **Colours / type:** tokens at the top of [`src/app/globals.css`](src/app/globals.css).
 
-## Learn More
+## Motion
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All animation runs through `useMotion` in [`src/lib/gsap.ts`](src/lib/gsap.ts), which only activates when the visitor has *not* asked for reduced motion. With reduced motion on, Lenis smooth-scroll, scroll animations, marquees and the hero video are all switched off and the content is shown as-is.
