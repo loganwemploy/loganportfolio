@@ -411,7 +411,8 @@ body {
 
   .tile,
   .tile-glyph,
-  .tile-visit {
+  .tile-visit,
+  .logo-slide {
     transition: none !important;
   }
 }
@@ -426,4 +427,47 @@ body {
 .tile-white .tile-visit {
   background: var(--ink);
   color: var(--butter);
+}
+
+/* ---------- company logo badges ---------- */
+
+/*
+ * Slides/iris-reveals while on screen (data-in), unveils when it leaves.
+ * --i is the badge's sibling index: forward stagger on reveal, reversed
+ * stagger on unveil, so a group opens and closes like a curtain.
+ * Only "armed" by JS, so no-JS / reduced-motion visitors always see it.
+ */
+.logo-slide {
+  --i: 0;
+  display: inline-block;
+  flex: none;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #fff;
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 1s var(--ease-out),
+    clip-path 0.9s var(--ease-out);
+}
+
+.logo-slide[data-armed] {
+  opacity: 0;
+  transform: var(--from, translateX(-0.9em) scale(0.5) rotate(-28deg));
+  clip-path: circle(0% at 50% 50%);
+  transition-delay: calc((4 - var(--i)) * 70ms);
+}
+
+.logo-slide[data-armed][data-in] {
+  opacity: 1;
+  transform: none;
+  clip-path: circle(100% at 50% 50%);
+  transition-delay: calc(var(--i) * 120ms);
+}
+
+/* large badge centred on a work tile */
+.tile-logo {
+  --from: translateY(45%) scale(0.6) rotate(-14deg);
+  width: 58cqw;
+  height: 58cqw;
+  box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5);
 }

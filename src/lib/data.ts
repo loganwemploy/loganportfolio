@@ -1,3 +1,10 @@
+import type { StaticImageData } from "next/image";
+import capitalOneLogo from "../../public/logos/capital-one.png";
+import coopersHawkLogo from "../../public/logos/coopers-hawk.png";
+import imsLogo from "../../public/logos/ims.png";
+import smilemakersLogo from "../../public/logos/smilemakers.png";
+import ymcaLogo from "../../public/logos/ymca.png";
+
 export const profile = {
   name: "Logan Wilson",
   role: "Full-Stack Software Engineer",
@@ -16,7 +23,34 @@ export const heroStatement =
 export const heroAside =
   "React, Next.js and Node.js for teams that move money and protect data. PCI-aware payment forms, secure APIs and access controls, shipped across enterprise ecommerce, fintech and a growing set of independent products.";
 
-export const aboutStatement = `${yearsBuilding} years in, I still care about the same thing: software that feels instant to the person using it and boring to the person trying to break it. I've shipped checkout for a winery-restaurant chain, merchandise ordering for McDonald's restaurants, and retailer tooling at Capital One, and I build independent products for small businesses and founders.`;
+export type AboutSegment =
+  | { text: string }
+  | {
+      company: string;
+      /** round badge shown right after the name */
+      logo?: StaticImageData;
+      /** punctuation kept inside the no-wrap group so it never orphans */
+      after?: string;
+      /** position among the logos; drives the staggered reveal delay */
+      order: number;
+    };
+
+// Newest role first. Smile Makers is the McDonald's merchandise platform built at IMS.
+export const aboutSegments: AboutSegment[] = [
+  {
+    text: `${yearsBuilding} years in, I still care about the same thing: software that feels instant to the person using it and boring to the person trying to break it. I've shipped shopping features at `,
+  },
+  { company: "Capital One", logo: capitalOneLogo, after: ",", order: 0 },
+  { text: " checkout at " },
+  { company: "Cooper's Hawk", logo: coopersHawkLogo, after: ",", order: 1 },
+  { text: " merchandise ordering for McDonald's restaurants through " },
+  { company: "Smile Makers", logo: smilemakersLogo, order: 2 },
+  { text: " at " },
+  { company: "IMS", logo: imsLogo, after: ",", order: 3 },
+  { text: " and marketing sites for the " },
+  { company: "YMCA of Metro Chicago", logo: ymcaLogo, after: ".", order: 4 },
+  { text: " I also build independent products for small businesses and founders." },
+];
 
 export type Stat = {
   prefix?: string;
@@ -157,6 +191,8 @@ export type Project = {
   href?: string;
   glyph: string;
   tone: "ink" | "butter" | "white";
+  /** enterprise projects show a company logo instead of the typographic glyph */
+  logo?: StaticImageData;
 };
 
 export const projects: Project[] = [
@@ -170,7 +206,8 @@ export const projects: Project[] = [
     focus: ["JavaScript", "Node.js", "SQL"],
     domain: "capitaloneshopping.com",
     glyph: "C1",
-    tone: "ink",
+    tone: "butter",
+    logo: capitalOneLogo,
   },
   {
     id: "coopers-hawk-shop",
@@ -183,7 +220,8 @@ export const projects: Project[] = [
     domain: "shop.coopershawkwinery.com",
     href: "https://shop.coopershawkwinery.com/",
     glyph: "CH",
-    tone: "butter",
+    tone: "ink",
+    logo: coopersHawkLogo,
   },
   {
     id: "coopers-hawk-winery",
@@ -197,6 +235,7 @@ export const projects: Project[] = [
     href: "https://chwinery.com/",
     glyph: "CHW",
     tone: "white",
+    logo: coopersHawkLogo,
   },
   {
     id: "smile-makers",
@@ -210,6 +249,7 @@ export const projects: Project[] = [
     href: "https://smilemakersonline.com/",
     glyph: "SM",
     tone: "ink",
+    logo: smilemakersLogo,
   },
   {
     id: "darick-dive",

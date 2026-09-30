@@ -1,8 +1,52 @@
 "use client";
 
 import { useRef } from "react";
-import { aboutStatement, pillars, stats } from "@/lib/data";
-import { gsap, scrubWords, useMotion } from "@/lib/gsap";
+import { aboutSegments, pillars, stats } from "@/lib/data";
+import { gsap, revealLogos, scrubWords, useMotion } from "@/lib/gsap";
+import { LogoBadge } from "./logo-badge";
+
+/** Splits text into `[data-w]` word spans (whitespace stays plain text). */
+function Words({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(\s+)/).map((token, i) =>
+        token === "" ? null : /^\s+$/.test(token) ? (
+          token
+        ) : (
+          <span key={i} data-w>
+            {token}
+          </span>
+        ),
+      )}
+    </>
+  );
+}
+
+function Statement() {
+  return (
+    <>
+      {aboutSegments.map((segment, i) =>
+        "company" in segment ? (
+          // name + logo + trailing punctuation stay together on one line
+          <span key={i} data-logo-trigger className="whitespace-nowrap">
+            <Words text={segment.company} />
+            {segment.logo ? (
+              <LogoBadge
+                logo={segment.logo}
+                index={segment.order}
+                sizes="48px"
+                className="ml-[0.16em] h-[0.62em] w-[0.62em] align-[-0.04em] ring-1 ring-ink/15"
+              />
+            ) : null}
+            {segment.after ? <span data-w>{segment.after}</span> : null}
+          </span>
+        ) : (
+          <Words key={i} text={segment.text} />
+        ),
+      )}
+    </>
+  );
+}
 
 export function About() {
   const root = useRef<HTMLElement>(null);
@@ -39,6 +83,9 @@ export function About() {
       ease: "power3.out",
       scrollTrigger: { trigger: el.querySelector("[data-pillars]"), start: "top 85%", once: true },
     });
+
+    // inline company logos slide in as their name reaches the reading zone
+    return revealLogos(el, "top 72%", "bottom 18%");
   });
 
   return (
@@ -50,7 +97,7 @@ export function About() {
             data-statement
             className="text-[clamp(1.7rem,3.9vw,4.1rem)] font-medium leading-[1.14] tracking-tight md:col-span-9"
           >
-            {aboutStatement}
+            <Statement />
           </p>
           <p className="text-[13px] font-medium md:col-span-1 md:text-right">
             [ 00 ]

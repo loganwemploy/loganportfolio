@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project, type ProjectGroup } from "@/lib/data";
-import { gsap, useMotion } from "@/lib/gsap";
+import { gsap, revealLogos, useMotion } from "@/lib/gsap";
 import { ArrowUpRight, GridIcon, ListIcon, Sparkle } from "./icons";
+import { LogoBadge } from "./logo-badge";
 import { SectionHead } from "./section-head";
 
 type View = "grid" | "list";
@@ -46,7 +47,7 @@ function GridCard({ project, index }: { project: Project; index: number }) {
   return (
     <li className="work-item">
       <CardShell project={project} className="work-card block outline-offset-8">
-        <div className={`tile tile-${project.tone}`}>
+        <div data-logo-trigger className={`tile tile-${project.tone}`}>
           <span className="absolute left-4 top-4 z-10 text-[10.5px] font-medium uppercase tracking-[0.14em]">
             {project.category}
           </span>
@@ -58,7 +59,17 @@ function GridCard({ project, index }: { project: Project; index: number }) {
             data-len={len >= 4 ? 4 : len}
             aria-hidden="true"
           >
-            {project.glyph}
+            {project.logo ? (
+              // sibling index within a row staggers the slide-in
+              <LogoBadge
+                logo={project.logo}
+                index={index % 3}
+                sizes="(min-width: 1024px) 260px, (min-width: 640px) 45vw, 90vw"
+                className="tile-logo"
+              />
+            ) : (
+              project.glyph
+            )}
           </span>
           {project.href ? (
             <span className="tile-visit z-10 flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[10.5px] font-medium uppercase tracking-[0.14em]">
@@ -99,14 +110,51 @@ function GridCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
+/** Column template shared by the list header and its rows (desktop). */
+const LIST_COLS =
+  "md:grid-cols-[4rem_2.75rem_minmax(0,2.2fr)_minmax(0,1.2fr)_minmax(0,1.8fr)_2.5rem]";
+
+const markTone = {
+  ink: "bg-ink text-butter",
+  butter: "bg-butter text-ink ring-1 ring-ink/20",
+  white: "bg-white text-ink ring-1 ring-ink/15",
+} as const;
+
+/** Round avatar for list rows: company logo, or the project's initials. */
+function ListMark({ project }: { project: Project }) {
+  const len = project.glyph.length;
+  if (project.logo) {
+    return (
+      <LogoBadge
+        logo={project.logo}
+        sizes="48px"
+        className="h-11 w-11 shadow-[0_6px_18px_-6px_rgba(0,0,0,0.35)]"
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid h-11 w-11 place-items-center rounded-full font-display font-black ${markTone[project.tone]} ${
+        len >= 4 ? "text-[9px]" : len === 3 ? "text-[11px]" : "text-[15px]"
+      }`}
+    >
+      {project.glyph}
+    </span>
+  );
+}
+
 function ListRow({ project, index }: { project: Project; index: number }) {
   return (
-    <li className="work-item border-b border-ink/15">
+    <li data-logo-trigger className="work-item border-b border-ink/15">
       <CardShell
         project={project}
-        className="group grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-2 py-5 transition-[background-color,padding] duration-500 hover:bg-butter hover:pl-5 focus-visible:bg-butter md:grid-cols-[4rem_minmax(0,2.2fr)_minmax(0,1.2fr)_minmax(0,1.8fr)_2.5rem] md:px-4 md:py-6"
+        className={`group grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-2 py-5 transition-[background-color,padding] duration-500 hover:bg-butter hover:pl-5 focus-visible:bg-butter ${LIST_COLS} md:px-4 md:py-6`}
       >
-        <span className="text-[12px] font-medium">[ {pad(index + 1)} ]</span>
+        <span className="hidden text-[12px] font-medium md:block">
+          [ {pad(index + 1)} ]
+        </span>
+        <ListMark project={project} />
         <span className="min-w-0">
           <span className="block truncate text-[clamp(1.2rem,2.2vw,2.1rem)] font-semibold leading-tight tracking-tight">
             {project.name}
@@ -185,6 +233,9 @@ export function Work() {
           },
         },
       );
+
+      // company logos slide in while their tile / row is on screen
+      return revealLogos(el);
     },
     [view, filter],
   );
@@ -225,9 +276,10 @@ export function Work() {
             <div>
               <div
                 aria-hidden="true"
-                className="hidden grid-cols-[4rem_minmax(0,2.2fr)_minmax(0,1.2fr)_minmax(0,1.8fr)_2.5rem] gap-x-4 border-b border-ink px-4 pb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-ink/60 md:grid"
+                className={`hidden ${LIST_COLS} gap-x-4 border-b border-ink px-4 pb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-ink/60 md:grid`}
               >
                 <span>No.</span>
+                <span />
                 <span>Project</span>
                 <span>Category</span>
                 <span>Focus</span>

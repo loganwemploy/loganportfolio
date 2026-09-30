@@ -18,19 +18,46 @@ export const MOTION_OK = "(prefers-reduced-motion: no-preference)";
  */
 export function useMotion(
   scope: RefObject<HTMLElement | null>,
-  build: () => void,
+  build: () => void | (() => void),
   dependencies: unknown[] = [],
 ) {
   useGSAP(
     () => {
       const mm = gsap.matchMedia(scope.current ?? undefined);
-      mm.add(MOTION_OK, () => {
-        build();
-      });
+      // whatever `build` returns runs as cleanup when the context reverts
+      mm.add(MOTION_OK, () => build());
       return () => mm.revert();
     },
     { scope, dependencies, revertOnUpdate: true },
   );
+}
+
+/**
+ * Slide/iris-reveal every `[data-logo-reveal]` inside `root` while it is on
+ * screen, and unveil it again when it leaves. Reveal order comes from the
+ * element's `--i` (its sibling index) via CSS transition delays, so the
+ * stagger lives in the stylesheet. Elements are only "armed" (hidden) here,
+ * so visitors without JS or with reduced motion always see them.
+ */
+export function revealLogos(root: Element, start = "top 80%", end = "bottom 12%") {
+  const nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-logo-reveal]"));
+  const triggers = nodes.map((node) => {
+    node.setAttribute("data-armed", "");
+    return ScrollTrigger.create({
+      trigger: node.closest<HTMLElement>("[data-logo-trigger]") ?? node,
+      start,
+      end,
+      onToggle: (self) => node.toggleAttribute("data-in", self.isActive),
+    });
+  });
+
+  return () => {
+    triggers.forEach((t) => t.kill());
+    nodes.forEach((node) => {
+      node.removeAttribute("data-armed");
+      node.removeAttribute("data-in");
+    });
+  };
 }
 
 /** Masked line-by-line reveal for a block of text, triggered on scroll. */
@@ -51,23 +78,23 @@ export function revealLines(el: Element, start = "top 85%") {
   });
 }
 
-/** Words fade up to full opacity as the block scrolls through the viewport. */
+/**
+ * Words fade up to full opacity as the block scrolls through the viewport.
+ * Words are pre-split in React (`[data-w]`) rather than by SplitText so the
+ * inline logo badges between them keep a stable DOM identity.
+ */
 export function scrubWords(el: Element) {
-  SplitText.create(el, {
-    type: "words",
-    autoSplit: true,
-    onSplit(self) {
-      return gsap.from(self.words, {
-        opacity: 0.18,
-        ease: "none",
-        stagger: 0.12,
-        scrollTrigger: {
-          trigger: el,
-          start: "top 82%",
-          end: "bottom 55%",
-          scrub: true,
-        },
-      });
+  const words = el.querySelectorAll("[data-w]");
+  if (!words.length) return;
+  gsap.from(words, {
+    opacity: 0.18,
+    ease: "none",
+    stagger: 0.12,
+    scrollTrigger: {
+      trigger: el,
+      start: "top 82%",
+      end: "bottom 55%",
+      scrub: true,
     },
   });
 }
