@@ -4,6 +4,7 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { heroAside, heroStatement, profile } from "@/lib/data";
 import { gsap, SplitText, useMotion } from "@/lib/gsap";
 import { FrameButton } from "./frame-button";
+import { ScrollCue } from "./scroll-cue";
 
 // Deterministic star field (integer LCG) so server and client markup match.
 let seed = 20130101;
@@ -74,11 +75,48 @@ export function Hero() {
     }
 
     tl.fromTo(
-      "[data-reveal]:not([data-statement])",
+      "[data-reveal]:not([data-statement]):not([data-sign])",
       { opacity: 0, y: 22 },
       { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out" },
       0.5,
     );
+
+    // The call to action is a hanging sign: it starts folded up edge-on at its
+    // hook, swings down on the hinge with a pendulum overshoot, then keeps
+    // swaying gently. On tall (stacked) layouts it sits below the fold, so the
+    // drop waits until it scrolls into view.
+    const sign = el.querySelector<HTMLElement>("[data-sign]");
+    const swing = el.querySelector<HTMLElement>("[data-sign-swing]");
+    const sway = el.querySelector<HTMLElement>("[data-sign-sway]");
+    if (sign && swing && sway) {
+      gsap.set(sign, { opacity: 1 });
+      gsap.set(swing, { autoAlpha: 0, transformPerspective: 900 });
+
+      const lead = sign.getBoundingClientRect().top < window.innerHeight ? 1.1 : 0.1;
+      const idle = gsap
+        .timeline({ paused: true })
+        .to(sway, { rotation: 1.8, duration: 1.4, ease: "sine.out" })
+        .to(sway, {
+          rotation: -1.8,
+          duration: 2.8,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: sign, start: "top 96%" },
+        })
+        .fromTo(
+          swing,
+          { rotationX: 86 },
+          { rotationX: 0, duration: 2.4, ease: "elastic.out(0.9, 0.55)" },
+          lead,
+        )
+        .to(swing, { autoAlpha: 1, duration: 0.2, ease: "none" }, lead)
+        .call(() => idle.play(), undefined, lead + 1.9);
+    }
 
     // The monogram splits apart as the hero scrolls away.
     const scrub = {
@@ -100,6 +138,18 @@ export function Hero() {
       rotate: 26,
       ease: "none",
       scrollTrigger: scrub,
+    });
+    // The scroll hint has done its job once the visitor starts scrolling.
+    gsap.to("[data-scroll-cue]", {
+      opacity: 0,
+      y: 14,
+      ease: "none",
+      scrollTrigger: {
+        trigger: el,
+        start: "top top",
+        end: "+=220",
+        scrub: true,
+      },
     });
     gsap.to("[data-hero-content]", {
       yPercent: -8,
@@ -157,7 +207,7 @@ export function Hero() {
 
       <div
         data-hero-content
-        className="relative z-10 mx-auto grid w-full max-w-[1800px] flex-1 grid-cols-1 items-center gap-10 px-5 pb-56 pt-32 md:px-8 md:pt-36 lg:grid-cols-12 lg:pb-44"
+        className="relative z-10 mx-auto grid w-full max-w-[1800px] flex-1 grid-cols-1 items-center gap-10 px-5 pb-56 pt-32 md:px-8 md:pt-36 lg:grid-cols-12 lg:pb-56"
       >
         <div className="lg:col-span-4">
           <p data-reveal className="mb-5 text-[13px] font-medium">
@@ -202,9 +252,20 @@ export function Hero() {
 
       <div
         data-reveal
+        data-sign
         className="absolute inset-x-0 bottom-8 z-10 flex justify-center"
       >
         <FrameButton />
+      </div>
+
+      {/* After the sign in the DOM so it stays clickable above its full-width wrapper. */}
+      <div
+        data-reveal
+        className="absolute bottom-8 right-5 z-10 hidden md:right-8 md:block"
+      >
+        <div data-scroll-cue>
+          <ScrollCue />
+        </div>
       </div>
     </section>
   );

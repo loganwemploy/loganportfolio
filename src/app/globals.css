@@ -157,7 +157,72 @@ body {
   );
 }
 
-/* ---------- four-sided marquee frame (the "play" button) ---------- */
+/* ---------- hanging sign (hero call to action) ---------- */
+
+/* Both wrappers pivot from the hook at the top of the cords. */
+.sign-swing,
+.sign-sway {
+  transform-origin: 50% 0;
+}
+
+.sign-sway {
+  display: flex;
+  flex-direction: column;
+  color: var(--butter);
+}
+
+.sign-cords {
+  position: relative;
+  display: block;
+  flex: none;
+  height: 58px;
+  pointer-events: none;
+}
+
+.sign-cords svg {
+  position: absolute;
+  inset: 9px 0 0;
+  width: 100%;
+  height: calc(100% - 9px);
+  overflow: visible;
+  fill: none;
+  stroke: rgba(242, 239, 163, 0.6);
+  stroke-width: 1;
+}
+
+.sign-hook {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  translate: -50% 0;
+  border: 1px solid var(--butter);
+  border-radius: 999px;
+}
+
+/* little eyelets where the cords meet the sign */
+.sign-cords::before,
+.sign-cords::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  width: 5px;
+  height: 5px;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: var(--butter);
+}
+
+.sign-cords::before {
+  left: 12%;
+}
+
+.sign-cords::after {
+  left: 88%;
+}
+
+/* ---------- four-sided marquee frame (the sign itself) ---------- */
 
 .frame {
   --w: clamp(250px, 28vw, 360px);
@@ -168,8 +233,12 @@ body {
   width: var(--w);
   height: var(--h);
   color: var(--butter);
-  background: none;
+  background: rgba(14, 14, 13, 0.82);
   border: 0;
+  border-radius: 24px;
+  box-shadow:
+    inset 0 0 0 1px rgba(242, 239, 163, 0.28),
+    0 26px 48px -22px rgba(0, 0, 0, 0.8);
   padding: 0;
   cursor: pointer;
 }
@@ -250,10 +319,17 @@ body {
     border-color 0.4s var(--ease-out);
 }
 
-.frame-core svg {
-  width: 34px;
-  height: 34px;
-  transition: transform 0.6s var(--ease-out);
+.frame-label {
+  font-size: clamp(13px, 1.45vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* trailing letter-spacing would nudge the text off-centre */
+  margin-right: -0.18em;
+  transition:
+    letter-spacing 0.6s var(--ease-out),
+    margin-right 0.6s var(--ease-out);
 }
 
 .frame:hover .frame-core,
@@ -263,9 +339,66 @@ body {
   border-color: var(--butter);
 }
 
-.frame:hover .frame-core svg,
-.frame:focus-visible .frame-core svg {
-  transform: rotate(90deg) scale(1.15);
+.frame:hover .frame-label,
+.frame:focus-visible .frame-label {
+  letter-spacing: 0.26em;
+  margin-right: -0.26em;
+}
+
+/* ---------- hero scroll cue ---------- */
+
+.scroll-cue {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--butter);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.scroll-cue-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.scroll-cue-ring {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(242, 239, 163, 0.35);
+  border-radius: 999px;
+  transition:
+    background 0.4s var(--ease-out),
+    color 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+
+.scroll-cue-ring svg {
+  width: 18px;
+  height: 18px;
+  animation: cue-bob 1.8s ease-in-out infinite;
+}
+
+.scroll-cue:hover .scroll-cue-ring,
+.scroll-cue:focus-visible .scroll-cue-ring {
+  background: var(--butter);
+  color: var(--ink);
+  border-color: var(--butter);
+}
+
+@keyframes cue-bob {
+  0%,
+  100% {
+    translate: 0 -3px;
+  }
+  50% {
+    translate: 0 3px;
+  }
 }
 
 @keyframes marquee-x {
@@ -405,6 +538,7 @@ body {
 
   .star-dot,
   .frame-track,
+  .scroll-cue-ring svg,
   .big-marquee-track {
     animation: none !important;
   }
@@ -412,6 +546,8 @@ body {
   .tile,
   .tile-glyph,
   .tile-visit,
+  .frame-label,
+  .scroll-cue-ring,
   .logo-slide {
     transition: none !important;
   }

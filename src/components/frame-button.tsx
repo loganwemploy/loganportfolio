@@ -42,24 +42,37 @@ function Strip({
 }
 
 /**
- * Four independent marquees form a rotating frame around a centre button.
- * Clockwise flow: top →, right ↓, bottom ←, left ↑.
+ * A hanging sign: four independent marquees form a frame around a centre
+ * button, which dangles from two cords. The hero animates the wrappers —
+ * `data-sign-swing` drops the sign down on its hinge, `data-sign-sway` then
+ * keeps it gently swaying. Both pivot from the hook at the top of the cords.
+ * Marquee clockwise flow: top →, right ↓, bottom ←, left ↑.
  */
 export function FrameButton() {
   return (
-    <button
-      type="button"
-      className="frame"
-      aria-label="View the work"
-      onClick={() => scrollToId("work")}
-    >
-      <Strip side="top" reverse duration="18s" />
-      <Strip side="right" reverse duration="14s" />
-      <Strip side="bottom" duration="18s" />
-      <Strip side="left" reverse duration="14s" />
-      <span className="frame-core">
-        <Sparkle />
-      </span>
-    </button>
+    <div data-sign-swing className="sign-swing">
+      <div data-sign-sway className="sign-sway">
+        <span aria-hidden="true" className="sign-cords">
+          <span className="sign-hook" />
+          <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+            <path d="M12 50 50 0 88 50" vectorEffect="non-scaling-stroke" />
+          </svg>
+        </span>
+        <button
+          type="button"
+          className="frame"
+          aria-label="View my work"
+          onClick={() => scrollToId("work")}
+        >
+          <Strip side="top" reverse duration="18s" />
+          <Strip side="right" reverse duration="14s" />
+          <Strip side="bottom" duration="18s" />
+          <Strip side="left" reverse duration="14s" />
+          <span className="frame-core">
+            <span className="frame-label">View my work</span>
+          </span>
+        </button>
+      </div>
+    </div>
   );
 }
