@@ -68,6 +68,27 @@ export function Skills() {
       );
     });
 
+    // Parallax: the oversized image slides ±9% of its own height (≈ ±11% of
+    // the frame) against the scroll, staying inside the 12.5% it overhangs.
+    const band = el.querySelector<HTMLElement>("[data-parallax]");
+    const img = el.querySelector<HTMLElement>("[data-parallax-img]");
+    if (band && img) {
+      gsap.fromTo(
+        img,
+        { yPercent: -9 },
+        {
+          yPercent: 9,
+          ease: "none",
+          scrollTrigger: {
+            trigger: band,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        },
+      );
+    }
+
     gsap.from(el.querySelectorAll("[data-group]"), {
       opacity: 0,
       y: 32,
@@ -92,16 +113,21 @@ export function Skills() {
         <div className="mx-auto max-w-[1800px] px-5 md:px-8">
           <SectionHead label="Toolkit" index="03" title="What's in the bag." />
         </div>
-
-        <div className="mt-16 space-y-1 md:mt-24">
-          {marqueeRows.map((row, i) => (
-            <BigMarquee
-              key={i}
-              words={row}
-              reverse={i % 2 === 1}
-              duration={i % 2 ? "55s" : "48s"}
-            />
-          ))}
+        {/* Full-bleed band. The image is taller than its frame and drifts inside it as the page scrolls. */}
+        <div
+          data-parallax
+          className="relative mt-20 h-[clamp(300px,46vw,760px)] overflow-hidden md:mt-28"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- remote animated GIF; next/image would freeze it */}
+          <img
+          style={{filter: "saturate(0.15)"}}
+            data-parallax-img
+            src="https://i.makeagif.com/media/7-04-2022/zSW_4r.gif"
+            alt="Skills"
+            loading="lazy"
+            draggable={false}
+            className="absolute inset-x-0 -top-[12.5%] h-[125%] w-full object-cover will-change-transform"
+          />
         </div>
 
         <div
