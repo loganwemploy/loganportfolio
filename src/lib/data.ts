@@ -497,7 +497,7 @@ export const credentials = {
   },
   certifications: {
     range: "Jan 2022 – Feb 2023",
-    items: ["SoloLearn JavaScript Certification", "Node.js Developer Certification (Wes Bos)"],
+    items: ["SoloLearn JavaScript Certification (2018)", "Node.js Developer Certification (Wes Bos, 2018)"],
   },
   training: [
     "Information security & privacy",

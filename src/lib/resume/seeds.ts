@@ -199,8 +199,8 @@ const EDUCATION = () =>
 
 const CERTS = () =>
   list("Certifications", [
-    "SoloLearn JavaScript Certification",
-    "Node.js Developer Certification (Wes Bos)",
+    "SoloLearn JavaScript Certification (2018)",
+    "Node.js Developer Certification (Wes Bos, 2018)",
   ]);
 
 /* ---------- the variants ---------- */
