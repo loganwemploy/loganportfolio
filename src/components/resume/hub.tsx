@@ -114,7 +114,12 @@ export function ResumeHub() {
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <TopBar />
+      <TopBar>
+        <span className="rounded-full bg-white/10 px-3 py-1.5 text-[12px] text-butter">Resumes</span>
+        <Link href="/backoffice/applications" className="rounded-full px-3 py-1.5 text-[12px] text-butter/70 hover:bg-white/10 hover:text-butter">
+          Applications
+        </Link>
+      </TopBar>
       <main id="main" className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
