@@ -164,6 +164,25 @@ function load(): StudioState {
     }
   }
 
+  // One-time wording fixes for resumes saved before a built-in line changed.
+  // Only exact matches are touched; saved versions keep what was really sent.
+  const RENAMES: Record<string, string> = {
+    "SoloLearn JavaScript Certification": "SoloLearn JavaScript Certification (2018)",
+    "Node.js Developer Certification (Wes Bos)": "Node.js Developer Certification (Wes Bos, 2018)",
+  };
+  for (const doc of resumes) {
+    for (const s of doc.sections) {
+      if (s.kind !== "list") continue;
+      for (const item of s.items) {
+        const next = RENAMES[item.text.trim()];
+        if (next) {
+          item.text = next;
+          dirtyDocs = true;
+        }
+      }
+    }
+  }
+
   const versions: Record<string, ResumeVersion[]> = {};
   for (const doc of resumes) {
     const list = versionsOf(stored[doc.id]);
