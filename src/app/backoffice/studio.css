@@ -1,0 +1,489 @@
+/*
+ * Back office. The resume sheet is laid out in pt from the same numbers as the
+ * PDF (src/lib/resume/metrics.ts), with the same fonts and ligatures off, so
+ * the page you edit wraps like the file you download.
+ */
+
+@font-face {
+  font-family: "Studio Sans";
+  src: url("/fonts/Inter-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Sans";
+  src: url("/fonts/Inter-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Sans";
+  src: url("/fonts/Inter-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Sans";
+  src: url("/fonts/Inter-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Serif";
+  src: url("/fonts/SourceSerif4-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Serif";
+  src: url("/fonts/SourceSerif4-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Serif";
+  src: url("/fonts/SourceSerif4-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Studio Serif";
+  src: url("/fonts/SourceSerif4-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.panel-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(29 29 27 / 0.65);
+}
+
+/* ---------- the page ---------- */
+
+.sheet {
+  position: relative;
+  width: 612pt;
+  min-height: 792pt;
+  padding: var(--m);
+  background: #fff;
+  color: var(--c-text);
+  font-family: "Studio Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--s-body);
+  font-weight: 400;
+  line-height: var(--lh);
+  letter-spacing: 0;
+  text-align: left;
+  overflow-wrap: break-word;
+  font-kerning: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0, "kern" 0;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 18px 50px -20px rgb(0 0 0 / 0.35);
+}
+
+.sheet[data-font="serif"] {
+  font-family: "Studio Serif", ui-serif, Georgia, serif;
+}
+
+.r-header {
+  position: relative;
+}
+.r-header[data-align="center"] {
+  text-align: center;
+}
+.r-name {
+  display: block;
+  font-size: var(--s-name);
+  font-weight: 700;
+  line-height: var(--name-lh);
+}
+.r-headline {
+  display: block;
+  margin-top: var(--g-headline);
+  font-size: var(--s-headline);
+  font-weight: 600;
+  color: var(--c-accent);
+}
+.r-contacts-wrap {
+  position: relative;
+  margin-top: var(--g-contacts);
+  font-size: var(--s-contact);
+  color: var(--c-muted);
+}
+.r-contacts > .item {
+  display: inline;
+}
+.r-contact {
+  white-space: pre;
+}
+
+.r-sections > .item {
+  margin-top: var(--g-section);
+}
+.r-sections > .item:first-child,
+.r-sections > .empty-slot {
+  margin-top: var(--g-header);
+}
+
+.r-heading {
+  position: relative;
+  padding-bottom: var(--rule-pad);
+  border-bottom: var(--rule-w) solid var(--c-rule);
+  font-size: var(--s-heading);
+  font-weight: 700;
+  color: var(--c-accent);
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+}
+.r-heading-text {
+  display: block;
+}
+
+.r-children > .item:first-child,
+.r-children > .empty-slot {
+  margin-top: var(--g-heading);
+}
+.r-children[data-list^="entries:"] > .item + .item {
+  margin-top: var(--g-entry);
+}
+.r-children[data-list^="paras:"] > .item + .item {
+  margin-top: var(--g-para);
+}
+.r-children[data-list^="rows:"] > .item + .item,
+.r-children[data-list^="items:"] > .item + .item,
+.r-bullets > .item,
+.r-bullets > .empty-slot {
+  margin-top: var(--g-bullet);
+}
+
+.r-para {
+  display: block;
+}
+
+.r-head {
+  position: relative;
+}
+.r-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--col-gap);
+}
+.r-left {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+.r-right {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: var(--right-max);
+  text-align: right;
+  font-size: var(--s-meta);
+  color: var(--c-muted);
+}
+.r-left > *,
+.r-right > * {
+  display: block;
+}
+.r-title {
+  font-size: var(--s-title);
+  font-weight: 700;
+}
+.r-org {
+  font-size: var(--s-meta);
+  font-style: italic;
+}
+
+.r-bullet {
+  position: relative;
+  padding-left: var(--b-indent);
+}
+.r-bullet::before {
+  content: "•";
+  position: absolute;
+  top: 0;
+  left: var(--b-x);
+  color: var(--c-accent);
+}
+.r-bullet > * {
+  display: block;
+}
+
+.r-skill-label {
+  font-weight: 600;
+}
+
+/* ---------- editing ---------- */
+
+.sheet .item {
+  position: relative;
+}
+
+.sheet .field {
+  border-radius: 2px;
+  outline: none;
+  cursor: text;
+  transition: background-color 0.15s;
+}
+.sheet .field:hover {
+  background: rgb(0 0 0 / 0.04);
+}
+.sheet .field:focus {
+  background: color-mix(in srgb, var(--c-accent) 9%, transparent);
+}
+.sheet .field:empty::before {
+  content: attr(data-placeholder);
+  color: #a8a8a8;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  pointer-events: none;
+}
+
+/* Chrome around the page: drag handles on the left, tools on the right. */
+.sheet .handle,
+.sheet .gutter,
+.sheet .add-btn,
+.sheet .r-badge,
+.sheet .empty-note,
+.page-mark::after {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sheet .handle {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 20px;
+  margin-right: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #8a8a8a;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.sheet .handle:hover {
+  background: #f2efa3;
+  color: #1d1d1b;
+}
+.sheet .handle:active {
+  cursor: grabbing;
+}
+.sheet .handle svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sheet .gutter {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 2;
+  display: flex;
+  gap: 3px;
+  margin-left: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+/* Only the innermost hovered (or focused) item shows its controls. */
+.sheet .item:hover:not(:has(.item:hover)) > .handle,
+.sheet .item:hover:not(:has(.item:hover)) > .gutter,
+.sheet .item:focus-within:not(:has(.item:focus-within)) > .handle,
+.sheet .item:focus-within:not(:has(.item:focus-within)) > .gutter,
+.sheet .handle:focus-visible,
+.sheet .gutter:focus-within {
+  opacity: 1;
+}
+
+.r-contacts > .item > .handle {
+  top: auto;
+  right: auto;
+  bottom: 100%;
+  left: 0;
+  width: 18px;
+  height: 16px;
+  margin: 0 0 2px;
+}
+.r-contacts > .item > .gutter {
+  top: auto;
+  bottom: 100%;
+  left: 20px;
+  margin: 0 0 2px;
+}
+
+.sheet .tool {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: #fff;
+  color: #666;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.12);
+  cursor: pointer;
+}
+.sheet .tool:hover {
+  background: #f2efa3;
+  color: #1d1d1b;
+}
+.sheet .tool svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sheet .add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px dashed #c4c4c4;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b6b6b;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.sheet .add-btn:hover {
+  border-color: currentColor;
+  color: var(--c-accent);
+}
+.sheet .add-btn svg {
+  width: 11px;
+  height: 11px;
+}
+
+.sheet .empty-slot {
+  position: relative;
+}
+.sheet .empty-note {
+  color: #8a8a8a;
+  font-size: 12px;
+}
+
+.sheet .item.is-dragging {
+  opacity: 0.35;
+}
+.sheet .item[data-hidden] > :not(.handle, .gutter) {
+  opacity: 0.45;
+}
+
+.sheet .r-badge {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  translate: 0 -50%;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #fff1cc;
+  color: #7a4f00;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* Where a dragged item will land. */
+.sheet .item[data-drop]::after,
+.sheet .empty-slot[data-drop]::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  right: -8px;
+  left: -8px;
+  height: 2px;
+  border-radius: 2px;
+  background: #2563eb;
+  pointer-events: none;
+}
+.sheet .item[data-drop="before"]::after,
+.sheet .empty-slot[data-drop]::after {
+  top: -2px;
+}
+.sheet .item[data-drop="after"]::after {
+  bottom: -2px;
+}
+.sheet .r-contacts > .item[data-drop]::after {
+  top: 0;
+  right: auto;
+  bottom: 0;
+  left: -2px;
+  width: 2px;
+  height: auto;
+}
+.sheet .r-contacts > .item[data-drop="after"]::after {
+  right: -2px;
+  left: auto;
+}
+
+/* Where the PDF starts a new page. */
+.page-mark {
+  position: absolute;
+  z-index: 3;
+  top: -4px;
+  right: calc(-1 * var(--m));
+  left: calc(-1 * var(--m));
+  border-top: 1.5px dashed #d9480f;
+  pointer-events: none;
+}
+.page-mark::after {
+  content: "Page " attr(data-page) " starts here";
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: #d9480f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ---------- hub previews ---------- */
+
+.sheet-thumb {
+  --z: 0.33;
+  position: relative;
+  width: calc(612pt * var(--z));
+  height: calc(792pt * var(--z));
+  overflow: hidden;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.08),
+    0 10px 30px -14px rgb(0 0 0 / 0.35);
+}
+.sheet-thumb > .sheet {
+  transform: scale(var(--z));
+  transform-origin: 0 0;
+  box-shadow: none;
+  pointer-events: none;
+}
