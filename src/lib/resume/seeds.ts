@@ -134,10 +134,6 @@ const P = {
     entry("QRKings · Side Work", "Shift task app · Node.js, Netlify", "", "loganqrkings.netlify.app", [
       "Staff scan a station's QR code and photograph the finished task (\"Clean espresso machine\", \"Organize walk-in cooler\"); AI vision approves it and managers track completion on a shift calendar.",
     ]),
-  grillmarks: () =>
-    entry("Grillmarks", "Restaurant recipe reference · Next.js, Airtable", "2026", "grillmarks.vercel.app", [
-      "Recipe browser built on an Airtable recipe base: find dishes by occasion, protein and flavor, with sub-recipes linked to their own pages.",
-    ]),
   courtyard: () =>
     entry("The Courtyard Tech Café", "Team registration portal · Next.js, Google Apps Script", "2026", "", [
       "Registration portal that collects each new team member's details and sends them a branded confirmation email.",
@@ -246,7 +242,6 @@ const SPECS: Spec[] = [
           "Added guest-behavior analytics with Microsoft Clarity and pricing experiments (price drops, bundles, add-ons) measured by conversion lift, so managers decide from data.",
         ]),
         P.qrKings(),
-        P.grillmarks(),
         P.courtyard(),
       ]),
       entries("Experience", [

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:resumes": "tsc --module commonjs --moduleResolution node --target es2022 --esModuleInterop --skipLibCheck --outDir .next/resume-tests tests/resume-privacy.test.ts && node --test .next/resume-tests/tests/resume-privacy.test.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

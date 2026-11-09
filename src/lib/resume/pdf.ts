@@ -1,6 +1,7 @@
 import type { PDFFont } from "pdf-lib";
 import { FONT_KEYS, loadFontkit, loadFonts, type Fontkit, type FontSet } from "./fonts";
 import { layoutResume } from "./layout";
+import { removePrivateProject } from "./privacy";
 import { hexToRgb, PAGE, type FontKey } from "./metrics";
 import { FEATURES } from "./text";
 import { pdfFileName, type ResumeDoc } from "./types";
@@ -15,6 +16,7 @@ export type PdfResult = { bytes: Uint8Array; pages: number };
  * copy-paste read correctly. Emails, phone numbers and URLs become links.
  */
 export async function renderPdf(doc: ResumeDoc, lib: PdfLib, kit: Fontkit, fonts: FontSet): Promise<PdfResult> {
+  doc = removePrivateProject(doc);
   const { PDFDocument, PDFString, rgb, pushGraphicsState, popGraphicsState, setCharacterSpacing } = lib;
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(kit);

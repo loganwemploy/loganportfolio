@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { cloneDoc } from "./ops";
+import { removePrivateProject } from "./privacy";
 import { seedDoc, SEED_IDS } from "./seeds";
 import {
   DEFAULT_THEME,
@@ -94,7 +95,7 @@ export function normalizeDoc(raw: unknown): ResumeDoc | null {
   if (!isString(d.id) || !d.id || !Array.isArray(d.sections)) return null;
   const header = (d.header && typeof d.header === "object" ? d.header : {}) as Record<string, unknown>;
   const theme = (d.theme && typeof d.theme === "object" ? d.theme : {}) as Partial<ResumeDoc["theme"]>;
-  return {
+  return removePrivateProject({
     id: d.id,
     name: str(d.name, "Untitled resume"),
     target: str(d.target),
@@ -111,7 +112,7 @@ export function normalizeDoc(raw: unknown): ResumeDoc | null {
     },
     header: { name: str(header.name), headline: str(header.headline), contacts: bulletsOf(header.contacts, "c") },
     sections: d.sections.map(sectionOf).filter((s): s is Section => s !== null),
-  };
+  });
 }
 
 function versionsOf(raw: unknown): ResumeVersion[] {
@@ -152,6 +153,7 @@ function load(): StudioState {
   const resumes = Array.isArray(docs.resumes)
     ? docs.resumes.map(normalizeDoc).filter((d): d is ResumeDoc => d !== null)
     : [];
+  if (JSON.stringify(resumes) !== JSON.stringify(docs.resumes ?? [])) dirtyDocs = true;
   const removedSeeds = Array.isArray(docs.removedSeeds) ? docs.removedSeeds.filter(isString) : [];
 
   // First visit, or a built-in resume added since the last visit.
@@ -165,7 +167,7 @@ function load(): StudioState {
   }
 
   // One-time wording fixes for resumes saved before a built-in line changed.
-  // Only exact matches are touched; saved versions keep what was really sent.
+  // Only exact matches are touched. Privacy cleanup also applies to saved versions.
   const RENAMES: Record<string, string> = {
     "SoloLearn JavaScript Certification": "SoloLearn JavaScript Certification (2018)",
     "Node.js Developer Certification (Wes Bos)": "Node.js Developer Certification (Wes Bos, 2018)",
@@ -187,6 +189,7 @@ function load(): StudioState {
   for (const doc of resumes) {
     const list = versionsOf(stored[doc.id]);
     if (list.length) versions[doc.id] = list;
+    if (JSON.stringify(list) !== JSON.stringify(stored[doc.id] ?? [])) dirtyVersions = true;
   }
   return { v: 1, resumes, versions, removedSeeds };
 }
@@ -265,6 +268,7 @@ function wire() {
   window.addEventListener("storage", (e) => {
     if ((e.key !== DOCS_KEY && e.key !== VERSIONS_KEY) || dirtyDocs || dirtyVersions) return;
     state = load();
+    if (dirtyDocs || dirtyVersions) scheduleSave();
     emit();
   });
 }
@@ -272,7 +276,7 @@ function wire() {
 function ensure(): StudioState {
   if (!state) {
     state = load();
-    if (dirtyDocs) scheduleSave();
+    if (dirtyDocs || dirtyVersions) scheduleSave();
   }
   return state;
 }
@@ -322,7 +326,7 @@ export function updateDoc(docId: string, recipe: (draft: ResumeDoc) => void | bo
   draft.id = docId;
   draft.updatedAt = now();
   const resumes = s.resumes.slice();
-  resumes[i] = draft;
+  resumes[i] = removePrivateProject(draft);
   commit({ ...s, resumes }, { docs: true });
   return true;
 }
@@ -339,7 +343,7 @@ export function addDoc(doc: ResumeDoc, afterId?: string) {
   const s = ensure();
   const resumes = s.resumes.slice();
   const at = afterId ? resumes.findIndex((d) => d.id === afterId) : -1;
-  resumes.splice(at < 0 ? resumes.length : at + 1, 0, doc);
+  resumes.splice(at < 0 ? resumes.length : at + 1, 0, removePrivateProject(doc));
   commit({ ...s, resumes }, { docs: true });
 }
 
